@@ -28,21 +28,26 @@ uv add luxtts-onnx
 uv add "luxtts-onnx[gpu]"
 ```
 
-### Download models
+### Models
 
-Models are hosted on HuggingFace. The library auto-downloads on first use, or
-you can download manually:
+Models are automatically downloaded and exported on first use. No manual setup
+needed.
 
-```bash
-# Auto-download (default)
-uv run python -c "from luxtts_onnx import LuxTTSOnnx; LuxTTSOnnx()"
+On first run, `LuxTTSOnnx` will:
+1. Download `text_encoder.onnx`, `fm_decoder.onnx`, `tokens.txt` from
+   [YatharthS/LuxTTS](https://huggingface.co/YatharthS/LuxTTS) (SHA256 verified)
+2. Export `vocos.onnx` from the upstream PyTorch checkpoint (requires `[export]`
+   extras for the first run only)
 
-# Manual download to local directory
-uv run huggingface-cli download YatharthS/LuxTTS --local-dir models/
+Subsequent runs skip the download entirely.
+
+```python
+# Auto-download to HuggingFace cache (default)
+tts = LuxTTSOnnx()
+
+# Auto-download to a custom directory
+tts = LuxTTSOnnx(model_dir="my_models/")
 ```
-
-Required model files: `text_encoder.onnx`, `fm_decoder.onnx`, `vocos.onnx`,
-`tokens.txt`.
 
 ### Generate speech
 
@@ -106,18 +111,18 @@ Tested on NVIDIA GPU with 8-step ODE, reference audio 15 s:
 
 RTF = Real-Time Factor (lower is faster; < 1.0 means faster than real-time).
 
-## Re-exporting models
+## Re-exporting vocos
 
-To re-export ONNX models from the PyTorch checkpoint (requires `export` extras):
+To manually re-export `vocos.onnx` from the PyTorch checkpoint:
 
 ```bash
 uv add "luxtts-onnx[export]"
 uv run python scripts/export_vocos.py --output-dir models/
 ```
 
-`text_encoder.onnx` and `fm_decoder.onnx` are exported by the upstream LuxTTS
-project. See the [LuxTTS repo](https://github.com/ysharma3501/LuxTTS) for
-details.
+`text_encoder.onnx` and `fm_decoder.onnx` are provided by the upstream
+[LuxTTS](https://github.com/ysharma3501/LuxTTS) project and downloaded
+automatically.
 
 ## Built by
 
