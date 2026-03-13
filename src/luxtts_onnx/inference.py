@@ -34,14 +34,15 @@ from luxtts_onnx.tokenizer import EmiliaTokenizer
 
 logger = logging.getLogger(__name__)
 
-HF_REPO = "ProgCat/luxtts-onnx"
+HF_UPSTREAM = "YatharthS/LuxTTS"
+HF_VOCOS = "ProgCat/luxtts-onnx"
 
-# Required files: name -> expected SHA256
+# file -> (hf_repo, expected_sha256)
 REQUIRED_FILES = {
-    "text_encoder.onnx": "495eca2d5f8a911f5c361bcce5bd55cdd2508ccdd26ce3e9bf1d3c29eb974861",
-    "fm_decoder.onnx": "4510d4f5f049f14ef80207fca695e13c820e2cea61635f402954950bc62b1e3c",
-    "vocos.onnx": "8c00bfefb2ceb64247abd0a70b3ea4552e49c19fae60cbb037dbaf49cec3fd68",
-    "tokens.txt": "ce98c1afc5f7a20c2484dffdd68a1fff0a4a2cc707328833750c4476c37cdbda",
+    "text_encoder.onnx": (HF_UPSTREAM, "495eca2d5f8a911f5c361bcce5bd55cdd2508ccdd26ce3e9bf1d3c29eb974861"),
+    "fm_decoder.onnx": (HF_UPSTREAM, "4510d4f5f049f14ef80207fca695e13c820e2cea61635f402954950bc62b1e3c"),
+    "tokens.txt": (HF_UPSTREAM, "ce98c1afc5f7a20c2484dffdd68a1fff0a4a2cc707328833750c4476c37cdbda"),
+    "vocos.onnx": (HF_VOCOS, "8c00bfefb2ceb64247abd0a70b3ea4552e49c19fae60cbb037dbaf49cec3fd68"),
 }
 
 
@@ -59,11 +60,12 @@ def _ensure_models(model_dir: Path) -> None:
 
     Each file is checked individually: exists + SHA256 hash match.
     Missing or corrupted files are re-downloaded from HuggingFace.
+    Upstream files come from YatharthS/LuxTTS, vocos.onnx from ProgCat/luxtts-onnx.
     """
     model_dir.mkdir(parents=True, exist_ok=True)
-    hf_dir = None  # lazy download
+    hf_cache: dict[str, Path] = {}  # repo -> local path, lazy download
 
-    for name, expected_hash in REQUIRED_FILES.items():
+    for name, (repo, expected_hash) in REQUIRED_FILES.items():
         dst = model_dir / name
         need_copy = False
         if not dst.exists():
@@ -74,12 +76,12 @@ def _ensure_models(model_dir: Path) -> None:
             need_copy = True
 
         if need_copy:
-            if hf_dir is None:
-                logger.info("Downloading models from %s...", HF_REPO)
-                hf_dir = Path(snapshot_download(HF_REPO))
-            src = hf_dir / name
+            if repo not in hf_cache:
+                logger.info("Downloading from %s...", repo)
+                hf_cache[repo] = Path(snapshot_download(repo))
+            src = hf_cache[repo] / name
             if not src.exists():
-                raise FileNotFoundError(f"Expected {name} in {hf_dir}")
+                raise FileNotFoundError(f"Expected {name} in {hf_cache[repo]}")
             shutil.copy2(src, dst)
             logger.info("Installed %s", name)
 
@@ -208,7 +210,7 @@ class LuxTTSOnnx:
         if model_dir is not None:
             model_dir = Path(model_dir)
         else:
-            model_dir = Path(snapshot_download(HF_REPO))
+            model_dir = Path.home() / ".cache" / "luxtts-onnx" / "models"
 
         _ensure_models(model_dir)
 

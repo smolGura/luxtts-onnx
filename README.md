@@ -30,9 +30,13 @@ uv add "luxtts-onnx[gpu]"
 
 ### Models
 
-Models are automatically downloaded on first use from
-[ProgCat/luxtts-onnx](https://huggingface.co/ProgCat/luxtts-onnx) (SHA256
-verified per file). No PyTorch or manual setup needed.
+Models are automatically downloaded on first use (SHA256 verified per file).
+No PyTorch or manual setup needed.
+
+- `text_encoder.onnx`, `fm_decoder.onnx`, `tokens.txt` from
+  [YatharthS/LuxTTS](https://huggingface.co/YatharthS/LuxTTS) (upstream)
+- `vocos.onnx` from
+  [ProgCat/luxtts-onnx](https://huggingface.co/ProgCat/luxtts-onnx) (ONNX export)
 
 Subsequent runs skip the download entirely.
 
