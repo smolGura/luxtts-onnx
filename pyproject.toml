@@ -5,7 +5,7 @@ description = "Lightweight ONNX-based TTS inference for LuxTTS -- no PyTorch req
 requires-python = ">=3.11"
 license = "Apache-2.0"
 readme = "README.md"
-authors = [{ name = "smolGura" }]
+authors = [{ name = "ProgCat", email = "progcat@protonmail.com" }]
 keywords = ["tts", "onnx", "voice-cloning", "speech-synthesis"]
 classifiers = [
     "Development Status :: 3 - Alpha",
