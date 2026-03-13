@@ -34,12 +34,13 @@ from luxtts_onnx.tokenizer import EmiliaTokenizer
 
 logger = logging.getLogger(__name__)
 
-HF_REPO = "YatharthS/LuxTTS"
+HF_REPO = "ProgCat/luxtts-onnx"
 
-# Upstream files: name -> expected SHA256 (from YatharthS/LuxTTS on HuggingFace)
-UPSTREAM_FILES = {
+# Required files: name -> expected SHA256
+REQUIRED_FILES = {
     "text_encoder.onnx": "495eca2d5f8a911f5c361bcce5bd55cdd2508ccdd26ce3e9bf1d3c29eb974861",
     "fm_decoder.onnx": "4510d4f5f049f14ef80207fca695e13c820e2cea61635f402954950bc62b1e3c",
+    "vocos.onnx": "8c00bfefb2ceb64247abd0a70b3ea4552e49c19fae60cbb037dbaf49cec3fd68",
     "tokens.txt": "ce98c1afc5f7a20c2484dffdd68a1fff0a4a2cc707328833750c4476c37cdbda",
 }
 
@@ -56,17 +57,13 @@ def _sha256(path: Path) -> str:
 def _ensure_models(model_dir: Path) -> None:
     """Ensure all required ONNX models exist and are valid.
 
-    Per-file checks:
-    - text_encoder.onnx, fm_decoder.onnx, tokens.txt: verify SHA256 hash
-    - vocos.onnx: check existence only (exported locally, hash varies)
-
-    Missing or corrupted files are re-downloaded/re-exported automatically.
+    Each file is checked individually: exists + SHA256 hash match.
+    Missing or corrupted files are re-downloaded from HuggingFace.
     """
     model_dir.mkdir(parents=True, exist_ok=True)
     hf_dir = None  # lazy download
 
-    # Check each upstream file: exists + hash match
-    for name, expected_hash in UPSTREAM_FILES.items():
+    for name, expected_hash in REQUIRED_FILES.items():
         dst = model_dir / name
         need_copy = False
         if not dst.exists():
@@ -78,23 +75,13 @@ def _ensure_models(model_dir: Path) -> None:
 
         if need_copy:
             if hf_dir is None:
-                logger.info("Downloading upstream models from %s...", HF_REPO)
+                logger.info("Downloading models from %s...", HF_REPO)
                 hf_dir = Path(snapshot_download(HF_REPO))
             src = hf_dir / name
             if not src.exists():
                 raise FileNotFoundError(f"Expected {name} in {hf_dir}")
             shutil.copy2(src, dst)
             logger.info("Installed %s", name)
-
-    # Check vocos.onnx: existence only (exported locally, hash varies by env)
-    if not (model_dir / "vocos.onnx").exists():
-        logger.info("Missing vocos.onnx, exporting from PyTorch checkpoint...")
-        if hf_dir is None:
-            hf_dir = Path(snapshot_download(HF_REPO))
-        from luxtts_onnx.exporter import export_vocos
-
-        export_vocos(hf_dir, model_dir)
-        logger.info("Exported vocos.onnx")
 
 # Mel spectrogram config (matches VocosFbank)
 SAMPLE_RATE = 24000
