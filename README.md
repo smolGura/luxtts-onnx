@@ -114,6 +114,10 @@ uv run python scripts/export_vocos.py --output-dir models/
 project. See the [LuxTTS repo](https://github.com/ysharma3501/LuxTTS) for
 details.
 
+## Built by
+
+This project was built by [Claude Opus 4.6](https://claude.ai) (Anthropic's AI assistant).
+
 ## License
 
 Apache-2.0. See [LICENSE](LICENSE) and [NOTICE](NOTICE) for attribution.
