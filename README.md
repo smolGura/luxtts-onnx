@@ -116,7 +116,7 @@ details.
 
 ## Built by
 
-This project was built by [Claude Opus 4.6](https://claude.ai) (Anthropic's AI assistant).
+This project was built with [Claude Code](https://claude.ai/claude-code) (Claude Opus 4.6).
 
 ## License
 
