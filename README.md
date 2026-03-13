@@ -4,12 +4,17 @@ Lightweight ONNX Runtime inference for [LuxTTS](https://github.com/ysharma3501/L
 
 Supports voice cloning with a reference audio clip. Multilingual (English + Chinese).
 
-## Features
+## Highlights
 
-- Pure ONNX Runtime + numpy inference (no torch dependency)
-- CPU and GPU (CUDA) support
-- Pre-computed prompt for instant startup
-- 48 kHz output with dual-path Vocos vocoder
+Compared to the upstream LuxTTS (PyTorch), this package:
+
+- **Zero torch dependency**: Pure ONNX Runtime + numpy + librosa at runtime, saving ~2 GB install size
+- **ONNX-compatible Vocos vocoder**: Replaced `torch.fft` ISTFT with real-valued DFT basis matrix (`RealISTFT`), enabling full ONNX export of the dual-path 48 kHz + 24 kHz vocoder
+- **Linkwitz-Riley crossover in numpy**: FFT-based 4th-order Butterworth squared filter for merging the dual-path vocoder output, no scipy signal dependency
+- **librosa mel extraction**: Matched torchaudio behavior with `norm=None, htk=True` -- the default `norm='slaney'` causes 33x magnitude difference and silent output
+- **Pre-computed prompts (.npz)**: Encode reference voice once, save to disk, load instantly on subsequent runs -- skip mel extraction and tokenization on every call
+- **Removed Whisper dependency**: User provides transcript directly instead of running ASR on the reference audio
+- **GPU on par with PyTorch**: CUDA EP achieves RTF ~0.08x (12x real-time), same speed as torch
 
 ## Quick start
 
