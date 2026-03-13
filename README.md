@@ -17,17 +17,10 @@ Supports voice cloning with a reference audio clip. Multilingual (English + Chin
 
 ```bash
 # CPU only
-pip install luxtts-onnx
+uv add luxtts-onnx
 
 # GPU (requires CUDA 12 + cuDNN 9)
-pip install "luxtts-onnx[gpu]"
-```
-
-Or with uv:
-
-```bash
-uv add luxtts-onnx          # CPU
-uv add "luxtts-onnx[gpu]"   # GPU
+uv add "luxtts-onnx[gpu]"
 ```
 
 ### Download models
@@ -37,10 +30,10 @@ you can download manually:
 
 ```bash
 # Auto-download (default)
-python -c "from luxtts_onnx import LuxTTSOnnx; LuxTTSOnnx()"
+uv run python -c "from luxtts_onnx import LuxTTSOnnx; LuxTTSOnnx()"
 
 # Manual download to local directory
-huggingface-hub-cli download YatharthS/LuxTTS --local-dir models/
+uv run huggingface-cli download YatharthS/LuxTTS --local-dir models/
 ```
 
 Required model files: `text_encoder.onnx`, `fm_decoder.onnx`, `vocos.onnx`,
@@ -79,10 +72,10 @@ For CUDA acceleration, install the `gpu` extra and set `LD_LIBRARY_PATH` so that
 ONNX Runtime can find cuDNN:
 
 ```bash
-pip install "luxtts-onnx[gpu]"
+uv add "luxtts-onnx[gpu]"
 
-# Point to pip-installed NVIDIA libraries
-export LD_LIBRARY_PATH=$(python -c "
+# Point to uv-installed NVIDIA libraries
+export LD_LIBRARY_PATH=$(uv run python -c "
 import os, glob, site
 paths = []
 for sp in site.getsitepackages():
@@ -113,8 +106,8 @@ RTF = Real-Time Factor (lower is faster; < 1.0 means faster than real-time).
 To re-export ONNX models from the PyTorch checkpoint (requires `export` extras):
 
 ```bash
-pip install "luxtts-onnx[export]"
-python scripts/export_vocos.py --output-dir models/
+uv add "luxtts-onnx[export]"
+uv run python scripts/export_vocos.py --output-dir models/
 ```
 
 `text_encoder.onnx` and `fm_decoder.onnx` are exported by the upstream LuxTTS
