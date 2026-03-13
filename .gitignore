@@ -1,0 +1,30 @@
+# Models (download separately, too large for git)
+models/*.onnx
+models/*.npz
+models/*.bin
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+.venv/
+
+# ONNX Runtime profiling
+onnxruntime_profile__*.json
+
+# UV
+uv.lock
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# TensorRT cache
+/tmp/trt_cache/

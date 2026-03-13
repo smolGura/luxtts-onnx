@@ -1,0 +1,24 @@
+luxtts-onnx
+Copyright 2025 smolGura
+
+This project is a derivative work based on:
+
+LuxTTS (https://github.com/ysharma3501/LuxTTS)
+  Copyright 2024-2025 Yatharth Sharma
+  Licensed under the Apache License, Version 2.0
+
+ZipVoice / k2-fsa (https://github.com/k2-fsa/ZipVoice)
+  Copyright 2022-2025 Xiaomi Corp.
+  Authors: Daniel Povey, Zengwei Yao, Wei Kang, Han Zhu, Fangjun Kuang
+  Licensed under the Apache License, Version 2.0
+
+Vocos (https://github.com/gemelo-ai/vocos)
+  Licensed under the MIT License
+
+Modifications in this project:
+  - Replaced PyTorch inference with ONNX Runtime + numpy
+  - Replaced torchaudio mel extraction with librosa
+  - Replaced torch.fft ISTFT with real-valued DFT basis matrix (RealISTFT)
+  - Removed Whisper dependency (user provides transcript directly)
+  - Added pre-computed prompt save/load (.npz format)
+  - Added Linkwitz-Riley crossover merge in numpy
